@@ -82,7 +82,6 @@ function App() {
     await axios.post("http://localhost:8080/addMovie", inputs)
       .then(() => {
         setData(data.concat(inputs))
-        console.log(inputs)
         handleClose()
       })
   }
