@@ -108,9 +108,10 @@ function App() {
   //delete movie
 
   const deleteItem = async() => {
-    await axios.post(baseUrl + "deleteMovie/" + inputs.name)
+    await axios.post(baseUrl + "deleteMovie/" + inputs)
     .then(() => {
-      setData(data.filter(movie => movie.name!==inputs.name))
+      setData(data.filter(movie => movie.name!==inputs))
+      handleDelClose()
     })
   }
  
@@ -184,7 +185,7 @@ function App() {
 
     <div>
       <DialogTitle>
-        ¿Seguro que quiere eliminar esta película? {inputs && inputs.name} ?
+        ¿Seguro que quiere eliminar la película {inputs}?
       </DialogTitle>
       <DialogContent>
         <div onClick={() => deleteItem()}>
@@ -218,8 +219,8 @@ function App() {
     const genre = data[i].description;
     const actor = data[i].actor;
     const income = data[i].income;
-    const editbtn = <EditBtn />;
-    const deletebtn = <div onClick={() => selMovie(data[i])}><DeleteBtn/></div>;
+    const editbtn = <div onClick={() => selMovie(name)}><EditBtn /></div>;
+    const deletebtn = <div><DeleteBtn/></div>;
     const object = { name, genre, actor, income, editbtn, deletebtn  };
     rows.push(object);
   }
