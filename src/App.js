@@ -46,11 +46,13 @@ function App() {
 
   //------------------------------states and consume API---------------------------------//
 
-  const [data, setData] = useState([])
-  const [open, setOpen] = React.useState(false)
-  const [dopen, setDopen] = React.useState(false)
+  const [data, setData] = useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [dopen, setDopen] = React.useState(false);
+  const [eopen, setEopen] = React.useState(false);
 
   const [inputs, setInputs] = React.useState({
+    id: 0,
     name: "",
     description: "",
     actor: "",
@@ -73,6 +75,14 @@ function App() {
     setDopen(false)
   }
 
+  const handleClickEdOpen = () => {
+    setEopen(true)
+  }
+
+  const handleEdClose = () => {
+    setEopen(false)
+  }
+
   const handleChange = e => {
     const { name, value } = e.target;
     setInputs(prevState => ({
@@ -80,19 +90,23 @@ function App() {
       [name]: value
     }))
   }
-
-  //set data with selected
-  const selMovie = (movie) => {
+  
+   //set data with selected
+   const selMovie = (movie) => {
     setInputs(movie);
     handleClickDelOpen();
   }
-  
+
+  const selDataToEd = (dataEd) => {
+    setInputs(dataEd);
+    handleClickEdOpen();
+  }
   
   //list movies
   const getPetition = async () => {
     await axios.get(baseUrl + "allMovies")
       .then(response => {
-        setData(response.data)
+        setData(response.data);
       })
   }
 
@@ -108,10 +122,27 @@ function App() {
   //delete movie
 
   const deleteItem = async() => {
-    await axios.post(baseUrl + "deleteMovie/" + inputs)
+    await axios.post(baseUrl+"deleteMovie/"+inputs)
     .then(() => {
-      setData(data.filter(movie => movie.name!==inputs))
+      setData(data.filter(movie=>movie.name!==inputs))
       handleDelClose()
+    })
+  }
+
+  const editItem = async() => {
+    await axios.post(baseUrl + "editMovie/" + inputs.id + "/" + inputs.name + "/" + inputs.description + "/" + inputs.actor + "/" + inputs.income)
+    .then(() => { 
+      var newData = data
+      newData.map(movie => {
+        if(inputs.id===movie.id) {
+          movie.name=inputs.name;
+          movie.description=inputs.description;
+          movie.actor=inputs.actor;
+          movie.income=inputs.income;
+        }
+      })
+      setData(newData);
+      handleEdClose();
     })
   }
  
@@ -201,6 +232,68 @@ function App() {
 
   //--------------------------------------------------------------------------------//
 
+  //----------------------------------create form to edit movie-------------------------------//
+
+  //create dialog to insert data
+  const dialogEdit = (
+    <DialogContent>
+      <div className={classes.root}>
+
+        <TextField
+          name="name"
+          id="name"
+          label="Ingresar pelicula"
+          variant="outlined"
+          fullWidth
+          onChange={handleChange}
+          value={inputs.name}
+        />
+        <TextField
+          name="description"
+          id="genre"
+          label="Genero"
+          variant="outlined"
+          fullWidth
+          onChange={handleChange}
+          value={inputs.description}
+        />
+        <TextField
+          name="actor"
+          id="actor"
+          label="protagonista"
+          variant="outlined"
+          fullWidth
+          onChange={handleChange}
+          value={inputs.actor}
+        />
+        <TextField
+          name="income"
+          id="income"
+          label="valor ganado(en dolares)"
+          variant="outlined"
+          fullWidth
+          onChange={handleChange}
+          value={inputs.income}
+        />
+
+        <div align="center">
+
+          <div onClick={() => handleEdClose()}>
+            <CancelBtn />
+          </div>
+
+          <div onClick={() => editItem()}>
+            <SaveBtn />
+          </div>
+
+        </div>
+
+      </div>
+    </DialogContent>
+  )
+
+  //--------------------------------------------------------------------------------//
+
   //-------------------------data to build table------------------------------------//
 
   const columns = [
@@ -215,13 +308,14 @@ function App() {
   const rows = []
 
   for (var i = 0; i < data.length; i++) {
+    const item = data[i]
     const name = data[i].name;
     const genre = data[i].description;
     const actor = data[i].actor;
     const income = data[i].income;
     const editbtn = <div onClick={() => selMovie(name)}><EditBtn /></div>;
-    const deletebtn = <div><DeleteBtn/></div>;
-    const object = { name, genre, actor, income, editbtn, deletebtn  };
+    const deletebtn = <div onClick={() => selDataToEd(item)}><DeleteBtn/></div>;
+    const object = { name, genre, actor, income, editbtn, deletebtn };
     rows.push(object);
   }
 
@@ -285,6 +379,11 @@ function App() {
           <div>
               <Dialog open={dopen} onClose={() => handleDelClose()}>
                 {dialogConfirm}
+              </Dialog>
+            </div>
+            <div>
+              <Dialog open={eopen} onClose={() => handleEdClose()}>
+                {dialogEdit}
               </Dialog>
             </div>
         </Grid>
