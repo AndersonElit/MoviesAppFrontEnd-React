@@ -10,6 +10,8 @@ import DeleteBtn from "./components/buttons/EditBtn";
 import AddBtn from "./components/buttons/AddBtn";
 import CancelBtn from "./components/buttons/CancelBtn";
 import SaveBtn from "./components/buttons/SaveBtn";
+import YesBtn from "./components/buttons/YesBtn";
+import NoBtn from "./components/buttons/NoBtn";
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -19,6 +21,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 
 const useStyles = makeStyles((theme) => ({
@@ -45,6 +48,7 @@ function App() {
 
   const [data, setData] = useState([])
   const [open, setOpen] = React.useState(false)
+  const [dopen, setDopen] = React.useState(false)
 
   const [inputs, setInputs] = React.useState({
     name: "",
@@ -61,6 +65,14 @@ function App() {
     setOpen(false)
   }
 
+  const handleClickDelOpen = () => {
+    setDopen(true)
+  }
+
+  const handleDelClose = () => {
+    setDopen(false)
+  }
+
   const handleChange = e => {
     const { name, value } = e.target;
     setInputs(prevState => ({
@@ -69,6 +81,13 @@ function App() {
     }))
   }
 
+  //set data with selected
+  const selMovie = (movie) => {
+    setInputs(movie);
+    handleClickDelOpen();
+  }
+  
+  
   //list movies
   const getPetition = async () => {
     await axios.get(baseUrl + "allMovies")
@@ -79,13 +98,22 @@ function App() {
 
   //add a movie
   const postData = async () => {
-    await axios.post("http://localhost:8080/addMovie", inputs)
+    await axios.post(baseUrl + "addMovie", inputs)
       .then(() => {
         setData(data.concat(inputs))
         handleClose()
       })
   }
 
+  //delete movie
+
+  const deleteItem = async() => {
+    await axios.post(baseUrl + "deleteMovie/" + inputs.name)
+    .then(() => {
+      setData(data.filter(movie => movie.name!==inputs.name))
+    })
+  }
+ 
   useEffect(async () => {
     await getPetition()
   }, [])
@@ -134,18 +162,40 @@ function App() {
 
         <div align="center">
 
-          <div onClick={handleClose}>
+          <div onClick={() => handleClose()}>
             <CancelBtn />
           </div>
 
-          <div onClick={postData}>
+          <div onClick={() => postData()}>
             <SaveBtn />
           </div>
-          
+
         </div>
 
       </div>
     </DialogContent>
+  )
+
+  //--------------------------------------------------------------------------------//
+
+  //------------------------create form to confirm delete element-------------------//
+
+  const dialogConfirm = (
+
+    <div>
+      <DialogTitle>
+        ¿Seguro que quiere eliminar esta película? {inputs && inputs.name} ?
+      </DialogTitle>
+      <DialogContent>
+        <div onClick={() => deleteItem()}>
+          <YesBtn />
+        </div>
+        <div onClick={() => handleDelClose()}>
+          <NoBtn />
+        </div>
+      </DialogContent>
+    </div>
+
   )
 
   //--------------------------------------------------------------------------------//
@@ -169,8 +219,8 @@ function App() {
     const actor = data[i].actor;
     const income = data[i].income;
     const editbtn = <EditBtn />;
-    const deletebtn = <DeleteBtn />;
-    const object = { name, genre, actor, income, editbtn, deletebtn };
+    const deletebtn = <div onClick={() => selMovie(data[i])}><DeleteBtn/></div>;
+    const object = { name, genre, actor, income, editbtn, deletebtn  };
     rows.push(object);
   }
 
@@ -231,14 +281,19 @@ function App() {
           <Box m={2} pt={5}>
             {table}
           </Box>
+          <div>
+              <Dialog open={dopen} onClose={() => handleDelClose()}>
+                {dialogConfirm}
+              </Dialog>
+            </div>
         </Grid>
         <Grid item xs={12} align="center">
           <div>
-            <div onClick={handleClickOpen}>
+            <div onClick={() => handleClickOpen()}>
               <AddBtn />
             </div>
             <div>
-              <Dialog open={open} onClose={handleClose}>
+              <Dialog open={open} onClose={() => handleClose()}>
                 {dialogAdd}
               </Dialog>
             </div>

@@ -16,7 +16,7 @@ function EditBtn() {
     const classes = useStyles()
 
     return (
-        <div className={classes.root}>
+        <div  className={classes.root}>
             <Button variant="contained" color="default" size="small" startIcon={<EditOutlinedIcon />}>
                 Editar
             </Button>

@@ -19,7 +19,7 @@ function CancelBtn() {
     const classes = useStyles()
 
     return (
-        <Button className={classes.spaceButton} color="primary" variant="contained" startIcon={<CancelOutlinedIcon />}>
+        <Button  className={classes.spaceButton} color="primary" variant="contained" startIcon={<CancelOutlinedIcon />}>
             Cancelar
         </Button>
     )
