@@ -1,5 +1,4 @@
 import axios from 'axios';
-import './App.css';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -23,6 +22,7 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,10 +31,10 @@ const useStyles = makeStyles((theme) => ({
     Spacing: 8,
     '& > *': {
       margin: theme.spacing(0.5)
+    },
+    container: {
+      maxHeight: 440
     }
-  },
-  container: {
-    maxHeight: 440
   }
 }));
 
@@ -90,9 +90,9 @@ function App() {
       [name]: value
     }))
   }
-  
-   //set data with selected
-   const selMovie = (movie) => {
+
+  //set data with selected
+  const selMovie = (movie) => {
     setInputs(movie);
     handleClickDelOpen();
   }
@@ -101,7 +101,7 @@ function App() {
     setInputs(dataEd);
     handleClickEdOpen();
   }
-  
+
   //list movies
   const getPetition = async () => {
     await axios.get(baseUrl + "allMovies")
@@ -121,31 +121,31 @@ function App() {
 
   //delete movie
 
-  const deleteItem = async() => {
-    await axios.post(baseUrl+"deleteMovie/"+inputs)
-    .then(() => {
-      setData(data.filter(movie=>movie.name!==inputs))
-      handleDelClose()
-    })
+  const deleteItem = async () => {
+    await axios.post(baseUrl + "deleteMovie/" + inputs)
+      .then(() => {
+        setData(data.filter(movie => movie.name !== inputs))
+        handleDelClose()
+      })
   }
 
-  const editItem = async() => {
+  const editItem = async () => {
     await axios.post(baseUrl + "editMovie/" + inputs.id + "/" + inputs.name + "/" + inputs.description + "/" + inputs.actor + "/" + inputs.income)
-    .then(() => { 
-      var newData = data
-      newData.map(movie => {
-        if(inputs.id===movie.id) {
-          movie.name=inputs.name;
-          movie.description=inputs.description;
-          movie.actor=inputs.actor;
-          movie.income=inputs.income;
-        }
+      .then(() => {
+        var newData = data
+        newData.map(movie => {
+          if (inputs.id === movie.id) {
+            movie.name = inputs.name;
+            movie.description = inputs.description;
+            movie.actor = inputs.actor;
+            movie.income = inputs.income;
+          }
+        })
+        setData(newData);
+        handleEdClose();
       })
-      setData(newData);
-      handleEdClose();
-    })
   }
- 
+
   useEffect(async () => {
     await getPetition()
   }, [])
@@ -156,56 +156,55 @@ function App() {
 
   //create dialog to insert data
   const dialogAdd = (
-    <DialogContent>
-      <div className={classes.root}>
+    <div>
+      <DialogContent>
+        <div className={classes.root}>
 
-        <TextField
-          name="name"
-          id="name"
-          label="Ingresar pelicula"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-        />
-        <TextField
-          name="description"
-          id="genre"
-          label="Genero"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-        />
-        <TextField
-          name="actor"
-          id="actor"
-          label="protagonista"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-        />
-        <TextField
-          name="income"
-          id="income"
-          label="valor ganado(en dolares)"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-        />
-
-        <div align="center">
-
-          <div onClick={() => handleClose()}>
-            <CancelBtn />
-          </div>
-
-          <div onClick={() => postData()}>
-            <SaveBtn />
-          </div>
+          <TextField
+            name="name"
+            id="name"
+            label="Ingresar pelicula"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+          />
+          <TextField
+            name="description"
+            id="genre"
+            label="Genero"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+          />
+          <TextField
+            name="actor"
+            id="actor"
+            label="protagonista"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+          />
+          <TextField
+            name="income"
+            id="income"
+            label="valor ganado(en dolares)"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+          />
 
         </div>
 
-      </div>
-    </DialogContent>
+      </DialogContent>
+      <DialogActions style={{justifyContent: 'center'}}>
+        <div onClick={() => handleClose()}>
+          <CancelBtn />
+        </div>
+        <div onClick={() => postData()}>
+          <SaveBtn />
+        </div>
+      </DialogActions>
+    </div>
   )
 
   //--------------------------------------------------------------------------------//
@@ -218,14 +217,14 @@ function App() {
       <DialogTitle>
         ¿Seguro que quiere eliminar la película {inputs}?
       </DialogTitle>
-      <DialogContent>
+      <DialogActions style={{justifyContent: 'center'}}>
         <div onClick={() => deleteItem()}>
           <YesBtn />
         </div>
         <div onClick={() => handleDelClose()}>
           <NoBtn />
         </div>
-      </DialogContent>
+      </DialogActions>
     </div>
 
   )
@@ -236,60 +235,58 @@ function App() {
 
   //create dialog to insert data
   const dialogEdit = (
-    <DialogContent>
-      <div className={classes.root}>
+    <div>
+      <DialogContent>
+        <div className={classes.root}>
 
-        <TextField
-          name="name"
-          id="name"
-          label="Ingresar pelicula"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-          value={inputs.name}
-        />
-        <TextField
-          name="description"
-          id="genre"
-          label="Genero"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-          value={inputs.description}
-        />
-        <TextField
-          name="actor"
-          id="actor"
-          label="protagonista"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-          value={inputs.actor}
-        />
-        <TextField
-          name="income"
-          id="income"
-          label="valor ganado(en dolares)"
-          variant="outlined"
-          fullWidth
-          onChange={handleChange}
-          value={inputs.income}
-        />
-
-        <div align="center">
-
-          <div onClick={() => handleEdClose()}>
-            <CancelBtn />
-          </div>
-
-          <div onClick={() => editItem()}>
-            <SaveBtn />
-          </div>
+          <TextField
+            name="name"
+            id="name"
+            label="Ingresar pelicula"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            value={inputs.name}
+          />
+          <TextField
+            name="description"
+            id="genre"
+            label="Genero"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            value={inputs.description}
+          />
+          <TextField
+            name="actor"
+            id="actor"
+            label="protagonista"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            value={inputs.actor}
+          />
+          <TextField
+            name="income"
+            id="income"
+            label="valor ganado(en dolares)"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            value={inputs.income}
+          />
 
         </div>
-
-      </div>
-    </DialogContent>
+      </DialogContent>
+      <DialogActions style={{justifyContent: 'center'}}>
+        <div onClick={() => handleEdClose()}>
+          <CancelBtn />
+        </div>
+        <div onClick={() => editItem()}>
+          <SaveBtn />
+        </div>
+      </DialogActions>
+    </div>
   )
 
   //--------------------------------------------------------------------------------//
@@ -314,7 +311,7 @@ function App() {
     const actor = data[i].actor;
     const income = data[i].income;
     const editbtn = <div onClick={() => selMovie(name)}><EditBtn /></div>;
-    const deletebtn = <div onClick={() => selDataToEd(item)}><DeleteBtn/></div>;
+    const deletebtn = <div onClick={() => selDataToEd(item)}><DeleteBtn /></div>;
     const object = { name, genre, actor, income, editbtn, deletebtn };
     rows.push(object);
   }
@@ -377,15 +374,15 @@ function App() {
             {table}
           </Box>
           <div>
-              <Dialog open={dopen} onClose={() => handleDelClose()}>
-                {dialogConfirm}
-              </Dialog>
-            </div>
-            <div>
-              <Dialog open={eopen} onClose={() => handleEdClose()}>
-                {dialogEdit}
-              </Dialog>
-            </div>
+            <Dialog open={dopen} onClose={() => handleDelClose()}>
+              {dialogConfirm}
+            </Dialog>
+          </div>
+          <div>
+            <Dialog open={eopen} onClose={() => handleEdClose()}>
+              {dialogEdit}
+            </Dialog>
+          </div>
         </Grid>
         <Grid item xs={12} align="center">
           <div>

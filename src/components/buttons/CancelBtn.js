@@ -6,11 +6,11 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     root: {
         '& > *': {
-            margin: theme.spacing(0.5)
+        margin: theme.spacing(0.5)
+        },
+        spaceButton: {
+            marginRight: theme.spacing(2)
         }
-    },
-    spaceButton: {
-        marginRight: theme.spacing(2)
     }
 }))
 
@@ -19,7 +19,7 @@ function CancelBtn() {
     const classes = useStyles()
 
     return (
-        <Button  className={classes.spaceButton} color="primary" variant="contained" startIcon={<CancelOutlinedIcon />}>
+        <Button className={classes.spaceButton} color="primary" variant="contained" startIcon={<CancelOutlinedIcon />}>
             Cancelar
         </Button>
     )
